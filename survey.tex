@@ -1,0 +1,48 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumerate}
+
+\title{Spectral Graph Sparsification}
+\author{Vedant Kumar}
+
+\begin{document}
+\maketitle
+
+\section*{Abstract}
+
+Graph sparsification produces sparse approximations of input graphs.  In
+this paper we survey major results in spectral sparsification, a special
+case in which important algebraic properties of graphs are preserved.  We
+provide intuition and rigour by explaining a key result: that every graph
+has a spectral sparsifier with $O(|V|\log|V|)$ edges.  We finish by
+discussing applications of spectral sparsification, such as computing
+electrical flows and finding min $s$-$t$ cuts.
+
+\section*{Introduction}
+
+Research in graph sparsification has been motivated by the fact that sparse
+graphs are easier to compute with than dense graphs. 
+
+\section*{References}
+
+\begin{enumerate}[1.]
+    \item Achlioptas, D., Mcsherry, F. Fast computation of low-rank matrix
+approximations. 2 (2007), 9.
+
+    \item Batson, J.D., Spielman, D.A., Srivastava, N.  Twice-Ramanujan
+sparsifiers. 6 (2012), 1704 –1721.
+
+    \item Benczúr, A.A., Karger, D.R.  Approximating s-t minimum cuts in O(n 2
+) time. In (1996), 47–55.
+
+    \item Chandra, A.K., Raghavan, P., Ruzzo, W.L., Smolensky, R., Tiwari, P.
+The electrical resistance of a graph captures its commute and cover times. In
+(1989), ACM, New York, NY, USA, 574–586.
+
+    \item Cheeger, J. A lower bound for smallest eigenvalue of Laplacian. In
+(1970), Princeton University Press, 195–199.
+\end{enumerate}
+
+\end{document}
