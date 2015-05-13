@@ -3,6 +3,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{enumerate}
+\usepackage[a4paper]{geometry}
 
 \title{Spectral Graph Sparsification}
 \author{Vedant Kumar}
@@ -10,20 +11,55 @@
 \begin{document}
 \maketitle
 
+\newcommand \textlcsc[1]{\textsc{\MakeLowercase{#1}}}
+
 \section*{Abstract}
 
-Graph sparsification produces sparse approximations of input graphs.  In
+Graph sparsification algorithms find sparse approximations of graphs. In
 this paper we survey major results in spectral sparsification, a special
 case in which important structural and algebraic properties of graphs are
-preserved.  We provide intuition for the theory by explaining a key result:
-that every graph has a spectral sparsifier with $O(\epsilon^{-2}|V|\log|V|)$
-edges w.h.p. We finish by discussing some applications, such as computing
-electrical flows and finding min $s$-$t$ cuts.
+preserved. We explain and provide intuition for a key result: that w.h.p
+every graph has a spectral sparsifier with $O(|V|\log|V|)$ edges, and that
+such a sparsifier can be found in $\tilde{O}(|E|)$ time. We finish by
+discussing some applications of spectral sparsification, such as computing
+electrical flows and finding minimum $s$-$t$ cuts.
 
-\section*{Introduction}
+\section{Introduction}
 
-Research in graph sparsification has been motivated by the fact that sparse
-graphs are easier to compute with than dense graphs. 
+Sparse graphs have a roughly proportional number of edges and vertices, at
+least up to a poly-logarathmic factor. In contrast, dense graphs (such as
+the complete graph) permit a quadratic number of edges. Graph algorithms
+usually run faster on sparse inputs, which conveniently also impose lower
+space requirements. Moreover, edges in sparse graphs tend to have a larger
+impact on the overall structure of the graph. Working with sparse graphs can
+save time, save space, and provide insight into the nature of a graph: this
+makes graph sparsification is interesting.
+
+\section{Measuring Similarity}
+
+We're trying to define `approximate'.
+
+\subsection{Definitions}
+
+\subsection{Cut similarity}
+
+Def. cut-similar, discuss.
+
+Describe Benczúr-Karger, state thm 1.
+
+\subsection{Spectral similarity}
+
+Def. spectrally-similar, discuss.
+
+Describe Spielman-Teng, go up to thm 4.
+
+\section{Sparsification with Sampling}
+
+Cover the effective-resistances paper.
+
+\section{Applications}
+
+\section{Overview}
 
 \section*{References}
 
