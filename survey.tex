@@ -18,28 +18,42 @@
 Graph sparsification algorithms find sparse approximations of graphs. In
 this paper we survey major results in spectral sparsification, a special
 case in which important structural and algebraic properties of graphs are
-preserved. We explain and provide intuition for a key result: that w.h.p
-every graph has a spectral sparsifier with $O(|V|\log|V|)$ edges, and that
+preserved. We explain and provide intuition for a key result: that every
+graph has a spectral sparsifier with $O(|V|\log|V|)$ edges w.h.p, and that
 such a sparsifier can be found in $\tilde{O}(|E|)$ time. We finish by
 discussing some applications of spectral sparsification, such as computing
-electrical flows and finding minimum $s$-$t$ cuts.
+electrical flows and finding minimum $s$-$t$ cuts in nearly-linear time.
 
 \section{Introduction}
 
-Sparse graphs have a roughly proportional number of edges and vertices, at
-least up to a poly-logarathmic factor. In contrast, dense graphs (such as
-the complete graph) permit a quadratic number of edges. Graph algorithms
-usually run faster on sparse inputs, which conveniently also impose lower
-space requirements. Moreover, edges in sparse graphs tend to have a larger
-impact on the overall structure of the graph. Working with sparse graphs can
-save time, save space, and provide insight into the nature of a graph: this
-makes graph sparsification is interesting.
+Sparse graphs have a comparable number of edges and vertices, up to a
+poly-logarathmic factor ($|E| \in \tilde{O}(|V|)$). In contrast, dense
+graphs (such as the complete graph) permit a quadratic number of edges ($|E|
+\in O(|V|^2)$). If the number of vertices is fixed, many graph algorithms
+run significantly faster and with lower space requirements on sparse inputs.
+Moreover, each edge in a sparse graph tends to contribute `more' to the
+overall structure of the graph.  Working with sparse graphs can save time,
+save space, and provide insight into the nature of a graph: this makes graph
+sparsification interesting.
+
+In order to assess the quality of a sparsification algorithm, we need a way
+to measure similarity between a graph and its sparse approximation. Section
+2 discusses two different measures of graph similarity --
+\textit{cut-similarity} and \textit{spectral-similarity} -- both of which
+led to the discovery of important sparsification algorithms. Section 3
+contains a detailed exposition of a fast spectral sparsification algorithm
+based on an edge-sampling scheme.  Section 4 mentions some applications of
+spectral sparsification, and Section 5 reprises some of the key ideas
+presented in this survey.
 
 \section{Measuring Similarity}
 
 We're trying to define `approximate'.
 
 \subsection{Definitions}
+
+For our purposes, a graph is a tuple of vertices, undirected edges, and edge
+weights $G = (V, E, w)$. 
 
 \subsection{Cut similarity}
 
