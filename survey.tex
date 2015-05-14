@@ -14,6 +14,7 @@
 
 \newcommand \cut[1]{\text{cut}_{#1}}
 \newcommand \textlcsc[1]{\textsc{\MakeLowercase{#1}}}
+\newcommand \Tr{\text{Tr}}
 
 \section*{Abstract}
 
@@ -56,13 +57,12 @@ the quality of a sparsifier.
 
 \subsection{Conventions}
 
-The only graphs we will consider are undirected, weighted, and connected. A
-graph can be described by a tuple $G = (V, E, w)$, where $w : V^2
-\rightarrow \Re$ maps edges to their weights. All edges must have positive
-weights, so $w(u, v) = 0 \Leftrightarrow (u, v) \not\in E$, allowing us to
-write $G = (V, w)$ w.l.o.g. For notational simplicity we define $n = |V|$
-and $m = |E|$. When comparing two graphs, we always assume that they share
-the same vertex set.
+The only graphs we consider are undirected, weighted, and connected. A graph
+can be described by a tuple $G = (V, E, w)$, where $w : V^2 \rightarrow \Re$
+maps edges to their weights. All edges must have positive weights, so $w(u,
+v) = 0 \Leftrightarrow (u, v) \not\in E$, allowing us to write $G = (V, w)$
+w.l.o.g. For notational simplicity we define $n = |V|$ and $m = |E|$. When
+comparing two graphs, we always assume that they share the same vertex set.
 
 \subsection{Cut similarity}
 
@@ -127,9 +127,9 @@ the vertex set $\{1..k\}$ have identical weights on both graphs because they
 don't touch $e'$, making the graphs fairly cut-similar. However, we know
 that the $k$-cycle is 2-connected while the $k$-path isn't. We conclude that
 the Fiedler values of the two graphs are dissimilar, which in turn implies
-spectral dissimilarity. Apart from connectivity, spectrally similar graphs
-are more likely to share a host of other structural characteristics captured
-by Laplacian quadratic form.
+spectral dissimilarity \cite{Fiedler}. Apart from connectivity, spectrally
+similar graphs are more likely to share a host of other structural
+characteristics captured by Laplacian quadratic form.
 
 Spectrally similar graphs also share algebraic properties. Consider the
 problem of finding vertex labellings $(l, \tilde{l})$ for
@@ -149,8 +149,8 @@ interested in is the $n \times n$ \textit{Laplacian matrix} of a graph:
 \begin{align*}
     L_G =
     \begin{cases}
-        -w(u, v) \qquad &\text{if } u \not= v \\
-        \sum_{z \in V} w(u, z) \qquad &\text{if } u = v
+        -w(u, v) \quad &\text{if } u \not= v \\
+        \sum_{z} w(u, z) \quad &\text{if } u = v
     \end{cases}
 \end{align*}
 We can use $L_G$ to simplify the Laplacian quadratic form: $Q_G(x) =
@@ -165,14 +165,72 @@ our two definitions are equivalent:
     i = u, j = v &:\quad -w(u, v)x_ux_v \\
     i = v, j = u &:\quad -w(u, v)x_ux_v
 \end{align*}
-We need a way to 
-Now we define the $\preceq$ relation to order matrices:
+We can order symmetric matrices in $\Re^{n \times n}$ by looking at their
+quadratic forms:
 \begin{align*}
-    x^TAx \preceq x^TBx \qquad \forall{x \in \Re^n}
+    A \preceq B \Leftrightarrow x^TAx \leq x^TBx \quad \forall{x \in \Re^n}
 \end{align*}
+Now we can check if two graphs are $\epsilon$-spectrally similar by
+comparing their Laplacians:
+\begin{align*}
+    (1 - \epsilon)L_{\tilde{G}} \preceq L_G \preceq (1 +
+    \epsilon)L_{\tilde{G}}
+\end{align*}
+The `$\preceq$' relation would be more useful if there were a simple way to
+compute it. By the Courant-Fischer theorem \cite{CourantFischer}, the $i$-th
+eigenvalue of a matrix is given by:
+\begin{align*}
+    \lambda_i(A) = \max_{S: \dim(S) = i} \min_{x \in S} \frac{x^TAx}{x^Tx}
+\end{align*}
+Note that the quadratic form of $A$ appears in $\lambda_i(A)$. We conclude
+that for $\epsilon$-spectrally similar graphs, the spectra of the graph
+Laplacians are similar:
+\begin{align*}
+    (1 - \epsilon)\lambda_i(L_{\tilde{G}}) \leq \lambda_i(L_G) \leq (1 +
+    \epsilon)\lambda_i(L_{\tilde{G}}) \quad \forall{i}
+\end{align*}
+This fact implies that edge weights are preserved between spectrally similar
+graphs since \footnote{We have used the fact that the Laplacian is positive
+semi-definite here, which is shown in Section 3.}:
+\begin{align*}
+    \Tr(L_G) = 2\sum_{e \in E} w(e) = \sum_i \lambda_i(L_G) \approx
+    \Tr(L_{\tilde{G}}) = 2\sum_{e \in \tilde{E}} \tilde{w}(e)
+\end{align*}
+This demonstrates that edges in spectral sparsifiers literally `carry more
+weight', and play a greater role in maintaining the structure of the graph.
 
+We are interested in building spectral sparsifiers using edge-sampling s.t
+$\tilde{G} \subset G$. In order to achieve spectral similarity, we would
+like $L_{\tilde{G}}$ to be close to $L_G$ in expectation. We can enforce
+$E[L_{\tilde{G}}] = L_G$ with the following process:
+\begin{itemize}
+    \item Assign each edge a selection probability $p_e$.
+    \item Initialize all edges weights $\tilde{w}_e$ in $\tilde{G}$ to 0:
+        when an edge $e$ is added to $\tilde{G}$, add $w_e/p_e$ to
+        $\tilde{w}_e$.
+    \item Sample edges from $G$ until $\tilde{G}$ is large enough.
+\end{itemize}
 
-Describe Spielman-Teng, go up to thm 4.
+If the edge selection probabilities are too high, $\tilde{G}$ becomes too
+dense. If they are too low, the spectrum of $L_{\tilde{G}}$ may not be close
+enough to the spectrum of $L_G$. The probabilities $p_e$ should reflect the
+fact that some edges are more important than others. An early edge-sampling
+scheme worked by splitting up the vertex set of $G$ into high-conductance
+components, and by prioritizing the edges between these components
+\cite{SpielmanTeng}. Roughly speaking, the conductance of a subset $S
+\subset V$ is the number of edges on the cut boundary of $S$ divided by the
+number of edges `contained' by the cut. This led to the following result: \\
+
+\noindent
+\textlcsc{Theorem 2 (Spielman-Teng)}: \textit{Let $\epsilon > 0$. $G = (V,
+E)$ has an $\epsilon$-spectrally similar graph $\tilde{G} \subset G$ s.t
+$\tilde{m} \in O(\epsilon^{-2}\log^2 n)$. $\tilde{G}$ can be found in
+$O(m\log^{O(1)}m)$ time \cite{SpielmanTeng} \cite{TheSurvey}.} \\
+
+Theorem 2 implies the somewhat surprising fact that arbitrary graphs have
+high-quality spectral sparsifiers. From here, our focus shifts to finding
+improved time and space bounds for the sparsification algorithm. Section 3
+covers a fast spectral sparsification algorithm in detail.
 
 \section{Fast Sparsification with Sampling}
 
@@ -192,8 +250,6 @@ Cover the effective-resistances paper.
 
 \section{Overview}
 
-\cite{CourantFischer}
-
 \bibliographystyle{unsrt}
 \bibliography{ref}
 
@@ -204,19 +260,9 @@ Cover the effective-resistances paper.
     \item Batson, J.D., Spielman, D.A., Srivastava, N.  Twice-Ramanujan
         sparsifiers. 6 (2012), 1704 –1721.
 
-    \item Batson, J.D., Spielman, D.A., Srivastava, N, Teng, S.  Spectral
-        Sparsification of Graphs: Theory and Applications. 8 (2013),
-        Communications of the ACM.
-
-    \item Bencz\'{u}r, A.A., Karger, D.R.  Approximating s-t minimum cuts in
-        $O(n^2)$ time. In (1996), 47–55.
-
     \item Chandra, A.K., Raghavan, P., Ruzzo, W.L., Smolensky, R., Tiwari,
         P.  The electrical resistance of a graph captures its commute and
         cover times. In (1989), ACM, New York, NY, USA, 574–586.
-
-    \item Cheeger, J. A lower bound for smallest eigenvalue of Laplacian. In
-        (1970), Princeton University Press, 195–199.
 
     \item Spielman, D.A., Srivastava, N. Graph sparsification by effective
         resistances.  6 (2011), 1913–1926.
