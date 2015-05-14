@@ -41,13 +41,11 @@ sparsification interesting.
 
 In order to assess the quality of a sparsification algorithm, we need a way
 to measure similarity between a graph and its sparse approximation. Section
-2 discusses two different measures of graph similarity --
-\textit{cut similarity} and \textit{spectral similarity} -- both of which
-led to the discovery of important sparsification algorithms. Section 3
-contains a detailed exposition of a fast spectral sparsification algorithm
-based on an edge-sampling scheme.  Section 4 mentions some applications of
-spectral sparsification, and Section 5 reprises some of the key ideas
-presented in this survey.
+2 discusses two different measures of graph similarity -- \textit{cut
+similarity} and \textit{spectral similarity} -- both of which led to the
+discovery of important sparsification algorithms. Section 3 contains a
+detailed exposition of a fast spectral sparsification algorithm based on an
+edge-sampling scheme. Section 4 mentions some applications.
 
 \section{Graph Similarity}
 
@@ -142,10 +140,10 @@ $\Re^n$.
 
 \subsection{Building spectral sparsifiers}
 
-Given the strength of the spectral similarity criterion it is not obvious
-that every graph has a sparse, spectrally-similar cousin. We need some
-linear algebra to find these spectral sparsifiers. The central object we are
-interested in is the $n \times n$ \textit{Laplacian matrix} of a graph:
+The spectral similarity criterion is very strong. It is not obvious that
+every graph has a sparse, spectrally-similar cousin. We need some linear
+algebra to find these spectral sparsifiers. The central object we are
+interested in is the $n \times n$ graph \textit{Laplacian matrix}:
 \begin{align*}
     L_G =
     \begin{cases}
@@ -153,12 +151,15 @@ interested in is the $n \times n$ \textit{Laplacian matrix} of a graph:
         \sum_{z} w(u, z) \quad &\text{if } u = v
     \end{cases}
 \end{align*}
-We can use $L_G$ to simplify the Laplacian quadratic form: $Q_G(x) =
-x^TL_Gx$. To see why this is true, recall that the quadratic form of a
-matrix $A$ is given by $x^TAx = \sum_{i,j} A_{i,j}x_ix_j$.  Every edge $(u,
-v)$ in $G$ contributes $w(u, v)[x_u^2 - 2x_ux_v + x_v^2]$ to the sum
-$Q_G(x)$. If we add up the following contributions, it becomes clear that
-our two definitions are equivalent:
+We can use $L_G$ to simplify the Laplacian quadratic form:
+\begin{align*}
+    Q_G(x) = x^TL_Gx
+\end{align*}
+To see why this is true, recall that the quadratic form of a matrix $A$ is
+$x^TAx = \sum_{i,j} A_{i,j}x_ix_j$.  Every edge $(u, v)$ in $G$ contributes
+$w(u, v)[x_u^2 - 2x_ux_v + x_v^2]$ to the sum $Q_G(x)$. If we add up the
+following contributions, it becomes clear that our two definitions are
+equivalent:
 \begin{align*}
     i = u, j = u &:\quad w(u, v)x_u^2 \\
     i = v, j = v &:\quad w(u, v)x_v^2 \\
@@ -190,7 +191,7 @@ Laplacians are similar:
     \epsilon)\lambda_i(L_{\tilde{G}}) \quad \forall{i}
 \end{align*}
 This fact implies that edge weights are preserved between spectrally similar
-graphs since \footnote{We have used the fact that the Laplacian is positive
+graphs because \footnote{We have used the fact that the Laplacian is positive
 semi-definite here, which is shown in Section 3.}:
 \begin{align*}
     \Tr(L_G) = 2\sum_{e \in E} w(e) = \sum_i \lambda_i(L_G) \approx
@@ -224,7 +225,7 @@ number of edges `contained' by the cut. This led to the following result: \\
 \noindent
 \textlcsc{Theorem 2 (Spielman-Teng)}: \textit{Let $\epsilon > 0$. $G = (V,
 E)$ has an $\epsilon$-spectrally similar graph $\tilde{G} \subset G$ s.t
-$\tilde{m} \in O(\epsilon^{-2}\log^2 n)$. $\tilde{G}$ can be found in
+$\tilde{m} \in O(\epsilon^{-2}n\log^2 n)$. $\tilde{G}$ can be found in
 $O(m\log^{O(1)}m)$ time \cite{SpielmanTeng} \cite{TheSurvey}.} \\
 
 Theorem 2 implies the somewhat surprising fact that arbitrary graphs have
@@ -233,6 +234,8 @@ improved time and space bounds for the sparsification algorithm. Section 3
 covers a fast spectral sparsification algorithm in detail.
 
 \section{Fast Sparsification with Sampling}
+
+start by stating end result
 
 A few facts about $L_G$:
 \begin{enumerate}[1.]
@@ -247,8 +250,6 @@ A few facts about $L_G$:
 Cover the effective-resistances paper.
 
 \section{Applications}
-
-\section{Overview}
 
 \bibliographystyle{unsrt}
 \bibliography{ref}
