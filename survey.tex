@@ -569,7 +569,7 @@ sparsifier but takes cubic time. Spielman-Srivastava can be run as follows:
         $\delta$.
 
     \item Compute $p_e = \frac{w_e||\tilde{Z}(\one_u -
-        \one_v)^2||^2_2}{n-1}$ for each edge. Sample $q$ edges based on the
+        \one_v)||^2_2}{n-1}$ for each edge. Sample $q$ edges based on the
         distribution $p_e$.
 
         Note that edges may be sampled efficiently using the array $P =
@@ -587,11 +587,41 @@ which is very surprising.
 
 \section{Computing Electrical Flows}
 
+In this section we explain why $R$ is called the effective resistance
+matrix, and show how to use $\tilde{Z}$ to approximate the resistance
+between any pair of vertices in a circuit. In conjunction with Ohm's law,
+this information gives us a way to compute voltage drops between nodes in a
+circuit as well as current flow.
+
+Consider a graph $G$ where the edges represent wires and the vertices
+represent nodes in a circuit. The edge weights correspond to conductances
+(i.e inverse resistances). Following the convention in
+\cite{SpielmanSrivastava}, let $i_{ext}(u)$ denote the amount of
+externally-supplied current at each node, let $i(e)$ denote the current flow
+along each edge, and let $v(u)$ denote the voltage at each node. The current
+flowing into a node equals the current flowing out:
+\begin{align*}
+    B^Ti = i_{ext}
+\end{align*}
+By Ohm's law, $i = v/r = v\sigma$, so:
+\begin{align*}
+    i = WBv
+\end{align*}
+This gives $i_{ext} = B^T(WBv) = Lv$. As long as we don't have a shorted
+circuit, $i_{ext}$ is not in $\ker(L)$ and we may write $v = L^+i_{ext}$. To
+compute effective resistances between any two nodes $(u, v)$, we inject a
+unit current at $u$ and extract the current at $v$:
+\begin{align*}
+    v_v - v_u = (\one_v - \one_u)^Tv
+\end{align*}
+Because $i_{ext} = (\one_v - \one_u)$, this expression gives us a row of
+$B^TL^+B = R$, the matrix of effective resistances between all pairs of
+nodes in the circuit. By the work done in the previous section, we know that
+it is possible to compute $\tilde{Z}$ in $\tilde{O}(m)$ time. We can
+approximate effective resistances between any pair of vertices by taking
+$||\tilde{Z}(\one_u -  \one_v)||^2_2$, which is fast ($O(\log m)$ time).
+
 \bibliographystyle{unsrt}
 \bibliography{ref}
-
-    Chandra, A.K., Raghavan, P., Ruzzo, W.L., Smolensky, R., Tiwari,
-        P.  The electrical resistance of a graph captures its commute and
-        cover times. In (1989), ACM, New York, NY, USA, 574–586.
 
 \end{document}
