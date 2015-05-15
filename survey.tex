@@ -29,8 +29,8 @@ case in which important structural and algebraic properties of graphs are
 preserved. We explain a key result: that every graph has a spectral
 sparsifier with $O(|V|\log|V|)$ edges w.h.p, and that such sparsifiers can
 be found in $\tilde{O}(|E|)$ time. We finish by discussing an application of
-spectral sparsification to the problem of computing electrical flows in
-nearly-linear time.
+spectral sparsification to the problem of computing electrical flows in a
+circuit in nearly-linear time.
 
 \section{Introduction}
 
@@ -44,13 +44,13 @@ overall shape and structure of the graph.  Working with sparse graphs can
 save time, save space, and provide insight into the nature of a graph: this
 makes graph sparsification interesting.
 
-In order to evaluate sparsification algorithms, we need to measure the
-similarity between a graph and its sparse approximation. Section 2 discusses
-two different measures of graph similarity -- \textit{cut similarity} and
-\textit{spectral similarity} -- both of which led to the discovery of
-important sparsification algorithms. Section 3 contains a detailed
-exposition of a fast spectral sparsification algorithm based on an
-edge-sampling scheme. Section 4 mentions some applications.
+In order to evaluate sparsification algorithms, we need a way to measure
+`similarity' between a graph and its sparse approximation. Section 2
+discusses two different measures of graph similarity -- \textit{cut
+similarity} and \textit{spectral similarity} -- both of which led to the
+discovery of important sparsification algorithms. Section 3 contains a
+detailed exposition of a fast spectral sparsification algorithm based on an
+edge-sampling scheme. Section 4 discusses a circuit-related application.
 
 \section{Graph Similarity}
 
@@ -62,8 +62,8 @@ quality. We also mention influential results in sparsification.
 
 The only graphs we consider are undirected, weighted, and connected. A graph
 can be described by a tuple $G = (V, E, w)$, where $w : V^2 \rightarrow \R$
-maps edges to their weights. All edges must have positive weights, so $w(u,
-v) = 0 \Leftrightarrow (u, v) \not\in E$, allowing us to write $G = (V, w)$
+maps edges to weights. All edges must have positive weights, so $w(u, v) = 0
+\Leftrightarrow (u, v) \not\in E$, allowing us to write $G = (V, w)$
 w.l.o.g. For notational simplicity we define $n = |V|$ and $m = |E|$. When
 comparing two graphs, we always assume that they share the same vertex set.
 Finally, we use the notation $A_k$ to refer to the $k$-th column vector of
@@ -104,9 +104,10 @@ sparsifiers exist for \textit{every} graph.
 
 \subsection{Spectral similarity}
 
-In this section we motivate and define spectral similarity. The
-\textit{Laplacian quadratic form} of a graph $G = (V, E, w)$ is given by the
-map $Q_G : \R^n \rightarrow \R$:
+In this section we motivate and define spectral similarity.
+
+The \textit{Laplacian quadratic form} of a graph $G = (V, E, w)$ is given by
+the map $Q_G : \R^n \rightarrow \R$:
 \begin{align*}
     Q_G(x) = \sum_{(u, v) \in E} w(u, v)(x(u) - x(v))^2
 \end{align*}
@@ -130,11 +131,11 @@ spectral similarity. Consider a $k$-cycle and a $k$-path. We can make the
 $k$-path a $k$-cycle by adding an edge $e'$. Most cuts on $\{1..k\}$ have
 identical weights on both graphs because they don't touch $e'$, so the
 graphs are fairly cut-similar. However, we know that the $k$-cycle is
-2-connected while the $k$-path isn't. We conclude that the second-smallest
-eigenvalues of the two graphs are dissimilar, implying spectral
+2-connected while the $k$-path isn't. We conclude that the graphs have
+dissimilar $\lambda_2$'s, the bipartitedness eigenvalue, implying spectral
 dissimilarity \cite{Fiedler}. Apart from connectivity, spectrally similar
-graphs are more likely to share a host of other structural characteristics
-captured by Laplacian quadratic form.
+graphs are more likely to share several other structural characteristics
+captured by the Laplacian quadratic form.
 
 Spectrally similar graphs also share algebraic properties. Consider the
 problem of finding vertex labellings $(l, \tilde{l})$ for
@@ -219,7 +220,7 @@ following process:
 \begin{itemize}
     \item Assign each edge a selection probability $p_e$ (most of our effort
         is expended here).
-    \item Initialize all edges weights $\tilde{w}_e$ in $\tilde{G}$ to 0:
+    \item Initialize all edge weights $\tilde{w}_e$ in $\tilde{G}$ to 0:
         when an edge $e$ is added to $\tilde{G}$, add $w_e/p_e$ to
         $\tilde{w}_e$.
     \item Sample edges from $G$ until $\tilde{G}$ is large enough.
@@ -405,8 +406,8 @@ Our goal is to find a sparsifier $\tilde{G}$ s.t the quadratic forms of $L$
 and $\tilde{L}$ are close. In this section, we show that sparsifiers which
 keep the quadratic forms of $\Pi$ and $\tilde{\Pi}$ close achieve this. The
 first step towards showing this is finding a symbolic expression for
-$\tilde{L}$. Suppose we sample $q$ edges to build $\tilde{G}$. Consider the
-random $(m \times m)$ \textit{edge sampling matrix}:
+$\tilde{L}$. If we sample $q$ edges to build $\tilde{G}$, we have a random
+$(m \times m)$ \textit{edge sampling matrix} given by:
 \begin{align*}
     S(e, e) = \frac{\tilde{w_e}}{w_e} = \text{(times e
     sampled)}\frac{w_e}{qp_e}\frac{1}{w_e} = \frac{\text{(times e
@@ -499,7 +500,7 @@ bound. The expected value of $yy^T$ over $\hat{y}$ is $\sum_e
 p_e\frac{1}{\sqrt{p_e}}\frac{1}{\sqrt{p_e}}\Pi_e\Pi^T_e = \Pi^2 = \Pi$,
 which gives us the second term we need. We verify that $||E[yy^T]||_2 =
 ||\Pi||_2 \leq 1$ (by definition, the spectral or 2-norm of $\Pi$ is its
-largest singular value). Finally, we verify that $y$ has an upper bound:
+largest singular value, 1). Finally, we verify that $y$ has an upper bound:
 \begin{align*}
     ||y||_2 = \frac{1}{p_e}\sqrt{\Pi(e, e)} = \sqrt{\frac{n -
     1}{w_eR_e}w_eR_e} = \sqrt{n-1} = M
@@ -522,13 +523,12 @@ In this section we discuss how to find a good set of edge selection
 probabilities. Recall that $p_e \approx w_eR_e$, and that the effective
 resistance matrix is given by $R = BL^+B^T$. It would be slow to compute $R$
 exactly.  Fortunately, an $\alpha$-approximation of $R$ can be used in
-Theorem 5, with the only side-effect of pushing the expected approximation
+Theorem 5 with the only side-effect of pushing the expected approximation
 error to $\frac{\alpha\epsilon}{2}$.
 
-To find a good approximation of $R$, we use a fact proven in Section 4 of
-\cite{SpielmanSrivastava}: the effective resistances $R_e$ are just pairwise
-distances of vectors in the space:
-\begin{align*}
+To find a good approximation of $R$, we use a fact proven in Section 4: the
+effective resistances $R_e$ are just pairwise distances of vectors in the
+space: \begin{align*}
     W^{1/2}BL^+\one_v \quad \forall{v \in V}
 \end{align*}
 These distances are more-or-less preserved if we project this space onto a
@@ -552,8 +552,9 @@ Koutis et. al \cite{TheSurvey} \cite{FastLaplacianSolver}.
 \subsection{Overview}
 
 In this section we summarize the Spielman-Srivastava algorithm. We also
-mention another spectral sparsification algorithm which produces a linear
-sparsifier but takes cubic time. Spielman-Srivastava can be run as follows:
+mention one last spectral sparsification algorithm. It produces a sparsifier
+with a linear number of edges in cubic time.  Standard Spielman-Srivastava
+can be run as follows:
 \begin{itemize}
     \item Compute an approximate effective resistance matrix $\tilde{Z}
         \approx QW^{1/2}BL^+$ by using a fast solver for Laplacian systems.
