@@ -355,17 +355,17 @@ invertible.
 In this section we define the Projection matrix $\Pi$ and prove some facts
 about it. Later, we show that $\Pi$ can be used to bound the spectral
 approximation error.  To define $\Pi$, we need the $(m \times m)$ symmetric
-\textit{resistance matrix} $R = BL^+B^T$, which has diagonal elements $R(e,
-e) = R_e$ \footnote{We explain the significance of $R$ in Section 4.}.  The
-$(m \times m)$ \textit{projection matrix} is $\Pi = W^{1/2}RW^{1/2}$. We
-list some properties of the projection matrix with proofs:
+\textit{resistance matrix} $R = BL^+B^T$, which is diagonal ($R(e, e) =
+R_e$) \footnote{We explain the significance of $R$ in Section 4.}.  The $(m
+\times m)$ \textit{projection matrix} is $\Pi = W^{1/2}RW^{1/2}$. We prove
+some properties of the projection matrix:
 \begin{enumerate}[1.]
     \item $\Pi$ is a projection matrix.
         
-        Proof: $\Pi^2 = \Pi$ can be checked mechanically. In the last step,
-        we have $\Pi^2 = W^{1/2}BL^+LL^+B^TW^{1/2} = W^{1/2}BL^+B^TW^{1/2} =
-        \Pi$, and we need the fact that $LL^+$ is the identity on
-        $\im(L^+)$.
+        Proof: The fact that $\Pi^2 = \Pi$ can be checked mechanically. In
+        the last step, we have $\Pi^2 = W^{1/2}BL^+LL^+B^TW^{1/2} =
+        W^{1/2}BL^+B^TW^{1/2} = \Pi$, and we need the fact that $LL^+$ is
+        the identity on $\im(L^+)$.
 
     \item The image of $\Pi$ is equal to the image of $W^{1/2}B$.
         
@@ -461,12 +461,60 @@ With some rearranging, we get:
     x^TLx - x^T\tilde{L}x &\leq \epsilon x^TLx \\
     (1 - \epsilon)x^TLx &\leq x^T\tilde{L}x
 \end{align*}
-Analogous algebra gives us for $\frac{x^T\tilde{L}x - x^TLx}{x^TLx}$ lets us
+Analogous algebra with $\frac{x^T\tilde{L}x - x^TLx}{x^TLx}$ lets us
 conclude $(1-\epsilon)L \preceq \tilde{L} \preceq (1+\epsilon)L$. We are now
 equipped with a powerful link between $L$ and $\Pi$ which simplifies the
 remainder of the analysis and leads to a practical edge-sampling strategy.
 
 \subsection{Bounding the expected approximation error}
+
+In this section we take a closer look at edge-selection probabilities and
+show how to bound the projection matrix approximation error $||\Pi S \Pi -
+\Pi\Pi||^2_2$ w.h.p. We use the following bound: \\
+
+\noindent
+\textlcsc{Theorem 5 (Rudelson-Vershynin)}: Let $\hat{p}$ be a probability
+distribution over $\Omega \subset \R^d$ s.t $\sup_{y \in \Omega} ||y||_2
+\leq M$ and $||E_{\hat{p}}[yy^T]||_2 \leq 1$. If $y_{1..q}$ are drawn
+independently from $\hat{p}$, then \cite{TheSurvey}
+\cite{SpielmanSrivastava} \cite{RudelsonVershynin}:
+\begin{align*}
+    E\left[\left| \frac{1}{q} \sum^q_{i=1} y_iy^T_i - E[yy^T] \right|_2
+    \right] \leq \min\left(CM\sqrt{\frac{\log q}{q}}, 1\right)
+\end{align*}
+
+The probabilities $p_e$ are weight-proportional to the \textit{effective
+resistances} $R_e$ from the resistance matrix. Given that $\sum_e w_eR_e =
+\Tr(\Pi) = n - 1$, we set $p_e = \frac{w_eR_e}{n - 1}$ to get a normalized
+probability distribution. Sampling $q$ edges (with replacement) corresponds
+to sampling columns of $\Pi$, giving:
+\begin{align*}
+    \Pi S\Pi &= \sum_e S(e, e)\Pi_e\Pi^T_e
+             = \sum_e \frac{\text{(times e sampled)}}{qp_e}\Pi_e\Pi^T_e
+             = \frac{1}{q}\sum_{i=1}^q y_iy^T_i
+\end{align*}
+Where the $y_i$ are i.i.d from $\hat{y} = \frac{1}{\sqrt{p_e}}\Pi_e$ s.t
+$\Pr[\hat{y} = y_e] = p_e$. We now have the first term we need for the
+bound. The expected value of $yy^T$ over $\hat{y}$ is $\sum_e
+p_e\frac{1}{\sqrt{p_e}}\frac{1}{\sqrt{p_e}}\Pi_e\Pi^T_e = \Pi^2 = \Pi$,
+which gives us the second term we need. We verify that $||E[yy^T]||_2 =
+||\Pi||_2 \leq 1$ (by definition, the spectral or 2-norm of $\Pi$ is its
+largest singular value). Finally, we verify that $y$ has an upper bound:
+\begin{align*}
+    ||y||_2 = \frac{1}{p_e}\sqrt{\Pi(e, e)} = \sqrt{\frac{n -
+    1}{w_eR_e}w_eR_e} = \sqrt{n-1} = M
+\end{align*}
+We pick $q \in O(\frac{C^2}{\epsilon^2}n\log n)$ and apply Theorem 5 to get:
+\begin{align*}
+    E[|\Pi S \Pi - \Pi\Pi|_2] =
+    E\left[\left| \frac{1}{q} \sum^q_{i=1} y_iy^T_i - E[yy^T] \right|_2
+    \right] \leq \frac{\epsilon}{2}
+\end{align*}
+Which holds for large $n$ and $\epsilon \geq \frac{1}{\sqrt{n}}$. Markov's
+inequality tells us that the probability of the approximation error being
+greater than $\epsilon$ is upper-bounded by $E[|\Pi S \Pi -
+\Pi\Pi|_2]/\epsilon = \frac{1}{2}$. In practice we expect the approximation
+error to be tightly concentrated around $\frac{\epsilon}{2}$.
 
 \subsection{Computing the edge selection probabilities}
 
