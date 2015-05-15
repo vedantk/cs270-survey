@@ -106,7 +106,7 @@ Consider a cut $S \subset V$: the $i$-th component of its
 otherwise. The expression $(\mathbf{1}_S(u) - \mathbf{1}_S(v))^2$ is 1 iff
 $(u, v)$ is an edge on the cut boundary of $S$, and is 0 otherwise. We
 conclude that $Q_G(\mathbf{1}_S)$ sums the weights of the edges on the cut
-$S$ \cite{TheSurvey}:
+$S$:
 \begin{align*}
     \cut{G}(S) = Q_G(\mathbf{1}_S)
 \end{align*}
@@ -136,7 +136,7 @@ labels fixed a priori. We can pose this as a regression problem. First solve
 for the unknowns in $l \in \Re^n$ by minimizing $Q_G(l)$, then use the
 result to approximate $\tilde{l}$. Intuitively, we expect to find a good
 approximation because $Q_G(x)$ and $Q_{\tilde{G}}(x)$ match very well over
-$\Re^n$.
+$\Re^n$ \cite{TheSurvey}.
 
 \subsection{Building spectral sparsifiers}
 
@@ -184,21 +184,22 @@ eigenvalue of a matrix is given by:
     \lambda_i(A) = \max_{S: \dim(S) = i} \min_{x \in S} \frac{x^TAx}{x^Tx}
 \end{align*}
 Note that the quadratic form of $A$ appears in $\lambda_i(A)$. We conclude
-that for $\epsilon$-spectrally similar graphs, the spectra of the graph
+that for $\epsilon$-spectrally similar graphs, the eigenvalues of the graph
 Laplacians are similar:
 \begin{align*}
     (1 - \epsilon)\lambda_i(L_{\tilde{G}}) \leq \lambda_i(L_G) \leq (1 +
     \epsilon)\lambda_i(L_{\tilde{G}}) \quad \forall{i}
 \end{align*}
-This fact implies that edge weights are preserved between spectrally similar
-graphs because \footnote{We have used the fact that the Laplacian is positive
-semi-definite here, which is shown in Section 3.}:
+This fact can be used to show that the total edge weight of a graph is
+roughly preserved by an $\epsilon$-spectral approximation \footnote{We have
+used the fact that the Laplacian is positive semi-definite here, which is
+shown in Section 3.}:
 \begin{align*}
     \Tr(L_G) = 2\sum_{e \in E} w(e) = \sum_i \lambda_i(L_G) \approx
     \Tr(L_{\tilde{G}}) = 2\sum_{e \in \tilde{E}} \tilde{w}(e)
 \end{align*}
-This demonstrates that edges in spectral sparsifiers literally `carry more
-weight', and play a greater role in maintaining the structure of the graph.
+Edges in spectral sparsifiers literally `carry more weight' and play a
+greater role in maintaining the structure of the graph.
 
 We are interested in building spectral sparsifiers using edge-sampling s.t
 $\tilde{G} \subset G$. In order to achieve spectral similarity, we would
@@ -215,12 +216,12 @@ $E[L_{\tilde{G}}] = L_G$ with the following process:
 If the edge selection probabilities are too high, $\tilde{G}$ becomes too
 dense. If they are too low, the spectrum of $L_{\tilde{G}}$ may not be close
 enough to the spectrum of $L_G$. The probabilities $p_e$ should reflect the
-fact that some edges are more important than others. An early edge-sampling
-scheme worked by splitting up the vertex set of $G$ into high-conductance
-components, and by prioritizing the edges between these components
-\cite{SpielmanTeng}. Roughly speaking, the conductance of a subset $S
-\subset V$ is the number of edges on the cut boundary of $S$ divided by the
-number of edges `contained' by the cut. This led to the following result: \\
+fact that some edges are more important than others. Informally, the
+\textit{conductance} of a subset $S \subset V$ is the number of edges on the
+cut boundary of $S$ divided by the number of edges `contained' by the cut.
+An early edge-sampling scheme worked by splitting up the vertex set of $G$
+into high-conductance components, and by prioritizing the edges between
+these components. This led to the following result: \\
 
 \noindent
 \textlcsc{Theorem 2 (Spielman-Teng)}: \textit{Let $\epsilon > 0$. $G = (V,
@@ -233,7 +234,7 @@ high-quality spectral sparsifiers. From here, our focus shifts to finding
 improved time and space bounds for the sparsification algorithm. Section 3
 covers a fast spectral sparsification algorithm in detail.
 
-\section{Fast Sparsification with Sampling}
+\section{Fast Spectral Sparsification}
 
 start by stating end result
 
