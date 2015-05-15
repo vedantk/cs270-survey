@@ -12,9 +12,14 @@
 \begin{document}
 \maketitle
 
+\newcommand \R{\mathbb{R}}
+\newcommand \one{\mathbf{1}}
+\newcommand \zero{\mathbf{0}}
+\newcommand \Tr{\text{Tr}}
+\newcommand \im{\text{im}}
+\newcommand \Span{\text{span}}
 \newcommand \cut[1]{\text{cut}_{#1}}
 \newcommand \textlcsc[1]{\textsc{\MakeLowercase{#1}}}
-\newcommand \Tr{\text{Tr}}
 
 \section*{Abstract}
 
@@ -56,7 +61,7 @@ quality. We also mention influential results in sparsification.
 \subsection{Conventions}
 
 The only graphs we consider are undirected, weighted, and connected. A graph
-can be described by a tuple $G = (V, E, w)$, where $w : V^2 \rightarrow \Re$
+can be described by a tuple $G = (V, E, w)$, where $w : V^2 \rightarrow \R$
 maps edges to their weights. All edges must have positive weights, so $w(u,
 v) = 0 \Leftrightarrow (u, v) \not\in E$, allowing us to write $G = (V, w)$
 w.l.o.g. For notational simplicity we define $n = |V|$ and $m = |E|$. When
@@ -101,24 +106,24 @@ sparsifiers exist for \textit{every} graph.
 
 In this section we motivate and define spectral similarity. The
 \textit{Laplacian quadratic form} of a graph $G = (V, E, w)$ is given by the
-map $Q_G : \Re^n \rightarrow \Re$:
+map $Q_G : \R^n \rightarrow \R$:
 \begin{align*}
     Q_G(x) = \sum_{(u, v) \in E} w(u, v)(x(u) - x(v))^2
 \end{align*}
 Consider a cut $S \subset V$: the $i$-th component of its
-\textit{characteristic vector} $\mathbf{1}_S$ is 1 if $v_i \in S$, and is 0
-otherwise. The expression $(\mathbf{1}_S(u) - \mathbf{1}_S(v))^2$ is 1 iff
+\textit{characteristic vector} $\one_S$ is 1 if $v_i \in S$, and is 0
+otherwise. The expression $(\one_S(u) - \one_S(v))^2$ is 1 iff
 $(u, v)$ is an edge on the cut boundary of $S$, and is 0 otherwise. We
-conclude that $Q_G(\mathbf{1}_S)$ sums the weights of the edges on the cut
+conclude that $Q_G(\one_S)$ sums the weights of the edges on the cut
 $S$:
 \begin{align*}
-    \cut{G}(S) = Q_G(\mathbf{1}_S)
+    \cut{G}(S) = Q_G(\one_S)
 \end{align*}
 We get cut similarity by restricting $Q_G$ to $\{0, 1\}^n$. The graphs $(G,
 \tilde{G})$ are \textit{$\epsilon$-spectrally similar} if:
 \begin{align*}
     (1 - \epsilon)Q_{\tilde{G}}(x) \leq Q_G(x) \leq (1 +
-    \epsilon)Q_{\tilde{G}}(x) \quad \forall{x \in \Re^n}
+    \epsilon)Q_{\tilde{G}}(x) \quad \forall{x \in \R^n}
 \end{align*}
 
 There is an intuitive way to see that cut similarity is not as strong as
@@ -136,10 +141,10 @@ Spectrally similar graphs also share algebraic properties. Consider the
 problem of finding vertex labellings $(l, \tilde{l})$ for
 $\epsilon$-spectrally similar graphs $(G, \tilde{G})$ with some of the
 labels fixed a priori. We can pose this as a regression problem. First solve
-for the unknowns in $l \in \Re^n$ by minimizing $Q_G(l)$, then use the
+for the unknowns in $l \in \R^n$ by minimizing $Q_G(l)$, then use the
 result to approximate a full labelling $\tilde{l}$. Intuitively, we expect
 to find a good approximation because $Q_G(x)$ and $Q_{\tilde{G}}(x)$ match
-very well over $\Re^n$ \cite{TheSurvey}.
+very well over $\R^n$ \cite{TheSurvey}.
 
 \subsection{The Laplacian quadratic form}
 
@@ -173,7 +178,7 @@ equivalent:
 \end{align*}
 We can order symmetric PSD matrices by looking at their quadratic forms:
 \begin{align*}
-    A \preceq B \Leftrightarrow x^TAx \leq x^TBx \quad \forall{x \in \Re^n}
+    A \preceq B \Leftrightarrow x^TAx \leq x^TBx \quad \forall{x \in \R^n}
 \end{align*}
 Now we can check if two graphs are $\epsilon$-spectrally similar by
 comparing their Laplacians \footnote{We have used the fact that the
@@ -295,37 +300,63 @@ weights are 1. We have:
         0 & 1 & -1 \\
         -1 & 0 & 1
     \end{pmatrix} \quad
-    L_G =
+    L_G = B^TB =
     \begin{pmatrix}
         2 & -1 & -1 \\
         -1 & 2 & -1 \\
         -1 & -1 & 2
-    \end{pmatrix} \quad
+    \end{pmatrix}
 \end{align*}
-The $i$-th diagonal element of $B^TB$ is given by $B^T_iB_i$, which simply
-counts the number of edges in the neighborhood of vertex $i$ (i.e $\sum_z
-w(i, z)$). For other entries $B^T_jB_i$ ($i \not= j$), all non-zero terms in
-the inner product must be negative because they must correspond to one of
-$(i, j)$ or $(j, i)$ (i.e $-w(i, j)$). The result is exactly the graph
-Laplacian.  If this intuitive approach is not satisfactory, it may suffice
-to verify that $L_G = B^T\mathbf{1}B$ for the triangle.
+The $i$-th diagonal element of $B^TB$ is given by $B^T_iB_i$, which counts
+the number of edges in the neighborhood of vertex $i$ (i.e $\sum_z w(i,
+z)$). For other entries $B^T_jB_i$ ($i \not= j$), all non-zero terms in the
+inner product must be negative because they correspond to one of $(i, j)$ or
+$(j, i)$ (i.e $-w(i, j)$). The result is exactly the graph Laplacian.
 
-We can now easily verify that $L_G$ is positive semi-definite (PSD):
+We can now verify that $L_G$ is positive semi-definite (PSD):
 \begin{align*}
     x^TL_Gx = x^TB^TWBx = ||W^{\frac{1}{2}}Bx||^2_2 \geq 0 \quad \forall{x
-    \in \Re^n}
+    \in \R^n}
+\end{align*}
+The null space of $L_G$ is the subspace spanned by $\one$. I.e, $\ker(L_G) =
+\ker(W^{\frac{1}{2}}B) = \Span(\one)$:
+\begin{align*}
+    x^TL_Gx = 0 &\Leftrightarrow ||W^{\frac{1}{2}}Bx||^2_2 = 0 \\
+                &\Leftrightarrow x(u) - x(v) = 0 \quad \text{for all edges}
+(u, v) \in E \text{ since } Q_G(x) = 0 \\
+    &\Leftrightarrow x \text{ is constant}
+\end{align*}
+$L_G$ can be diagonalized using the singular value decomposition. Let
+$\lambda_{1..n-1}$ be the non-zero eigenvalues and $u_{1..n-1}$ the
+eigenvectors:
+\begin{align*}
+    L_G = \sum_{i=1}^{n-1} \lambda_iu_iu^T_i = U\Sigma V^*
+\end{align*}
+The pseudo-inverse is given by:
+\begin{align*}
+    L^+_G = \sum_{i=1}^{n-1} \frac{1}{\lambda_i}u_iu^T_i = V\Sigma^+ U^*
+\end{align*}
+Fortunately, $L_GL^+_G$ behaves like the identity matrix when $\ker(L_G)$ is
+not involved (basically because $\zero$ is not invertible). When we are
+restricted to $\im(L_G) = \Span^{\bot}(\one)$, we have:
+\begin{align*}
+    L_GL^+_G &= U\Sigma V^*V\Sigma^+ U^*
+             = U\Sigma \one \Sigma^+ U^*
+             = U \one U^*
+             = \one \\
+    L^+_GL_G &= V\Sigma^+ U^*U\Sigma V^*
+             = V\Sigma^+ \one \Sigma V^*
+             = V\one V^*
+             = \one
 \end{align*}
 
-\begin{enumerate}[1.]
-    \item $L_G$ is symmetric.
+\subsection{The Projection matrix}
 
-        Proof: For the off-diagonal elements $u \not= v$, we have: $L_G(u,
-        v) = L_G(v, u) = -w(u, v)$.
+\subsection{Linking the Laplacian and Projection matrices}
 
-    \item $L_G$ 
-\end{enumerate}
+\subsection{Bounding the expected approximation error}
 
-Cover the effective-resistances paper.
+\subsection{Computing the edge selection probabilities}
 
 \section{Applications}
 
