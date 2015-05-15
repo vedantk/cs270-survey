@@ -44,12 +44,12 @@ overall shape and structure of the graph.  Working with sparse graphs can
 save time, save space, and provide insight into the nature of a graph: this
 makes graph sparsification interesting.
 
-In order to assess the quality of a sparsification algorithm, we need a way
-to measure similarity between a graph and its sparse approximation. Section
-2 discusses two different measures of graph similarity -- \textit{cut
-similarity} and \textit{spectral similarity} -- both of which led to the
-discovery of important sparsification algorithms. Section 3 contains a
-detailed exposition of a fast spectral sparsification algorithm based on an
+In order to evaluate sparsification algorithms, we need to measure the
+similarity between a graph and its sparse approximation. Section 2 discusses
+two different measures of graph similarity -- \textit{cut similarity} and
+\textit{spectral similarity} -- both of which led to the discovery of
+important sparsification algorithms. Section 3 contains a detailed
+exposition of a fast spectral sparsification algorithm based on an
 edge-sampling scheme. Section 4 mentions some applications.
 
 \section{Graph Similarity}
@@ -260,10 +260,10 @@ $\tilde{O}(m)$ time \cite{SpielmanSrivastava} \cite{TheSurvey}.} \\
 
 The Spielman-Srivastava algorithm has two stages: (1) compute edge selection
 probabilities, and (2) sample edges. The first step requires solving $\log
-m$ Laplacian systems, for which the best known time bound is $O(m \log m
-\log n \log\log n)$ \cite{FastLaplacianSolver} \cite{TheSurvey}. The second
-step can be completed in $O(\epsilon^{-2}n\log n)$ time, for a total runtime
-of $\tilde{O}(m)$.
+m$ Laplacian linear systems, for which the best known time bound is $O(m
+\log m \log n \log\log n)$ \cite{FastLaplacianSolver} \cite{TheSurvey}. The
+second step can be completed in $O(\epsilon^{-2}n\log n)$ time, for a total
+runtime of $\tilde{O}(m)$.
 
 \subsection{Preliminaries}
 
@@ -312,7 +312,7 @@ z)$). For other entries $B^T_jB_i$ ($i \not= j$), all non-zero terms in the
 inner product must be negative because they correspond to one of $(i, j)$ or
 $(j, i)$ (i.e $-w(i, j)$). The result is exactly the graph Laplacian.
 
-We can now verify that $L$ is positive semi-definite (PSD):
+We now verify that $L$ is positive semi-definite (PSD):
 \begin{align*}
     x^TLx = x^TB^TWBx = ||W^{1/2}Bx||^2_2 \geq 0 \quad \forall{x
     \in \R^n}
@@ -321,8 +321,8 @@ The null space of $L$ is the subspace spanned by $\one$. I.e, $\ker(L) =
 \ker(W^{1/2}B) = \Span(\one)$:
 \begin{align*}
     x^TLx = 0 &\Leftrightarrow ||W^{1/2}Bx||^2_2 = 0 \\
-                &\Leftrightarrow x(u) - x(v) = 0 \quad \text{for all edges}
-(u, v) \in E \text{ since } Q_G(x) = 0 \\
+                &\Leftrightarrow x(u) - x(v) = 0 \quad \text{for all edges }
+    (u, v) \in E \text{ since } Q_G(x) = 0 \\
     &\Leftrightarrow x \text{ is constant}
 \end{align*}
 $L$ can be diagonalized using the singular value decomposition. Let
@@ -335,19 +335,20 @@ The pseudo-inverse is given by:
 \begin{align*}
     L^+ = \sum_{i=1}^{n-1} \frac{1}{\lambda_i}u_iu^T_i = V\Sigma^+ U^*
 \end{align*}
-Fortunately, $LL^+$ behaves like the identity matrix when $\ker(L)$ is
-not involved (basically because $\zero$ is not invertible). When we are
-restricted to $\im(L) = \Span(\one)^{\bot}$, we have:
+When we are restricted to $\im(L) = \Span(\one)^{\bot}$, $LL^+$ is the
+identity:
 \begin{align*}
     LL^+ &= U\Sigma V^*V\Sigma^+ U^*
-             = U\Sigma \one \Sigma^+ U^*
-             = U \one U^*
-             = \one \\
+             = U\Sigma I \Sigma^+ U^*
+             = U I U^*
+             = I \quad \text{if } x \not\in \ker(L) \\
     L^+L &= V\Sigma^+ U^*U\Sigma V^*
-             = V\Sigma^+ \one \Sigma V^*
-             = V\one V^*
-             = \one
+             = V\Sigma^+ I \Sigma V^*
+             = V I V^*
+             = I \quad \text{if } x \not\in \ker(L)
 \end{align*}
+We need the pseudo-inverse because $L$ is not full-rank, and $\zero$ is not
+invertible.
 
 \subsection{The Projection matrix}
 
@@ -366,12 +367,11 @@ list some properties of the projection matrix with proofs:
         \Pi$, and we need the fact that $LL^+$ is the identity on
         $\im(L^+)$.
 
-    \item The image of $\Pi$ is equal to the image of the graph Laplacian.
+    \item The image of $\Pi$ is equal to the image of $W^{1/2}B$.
         
-        Proof: First note that $\im(\Pi) \subseteq \im(L)$.
+        Proof: First note that $\im(\Pi) \subseteq \im(W^{1/2}B)$.
         \begin{align*}
-            \im(\Pi) = \im(W^{1/2}BL^+B^TW^{1/2}) \subseteq \im(W^{1/2}B) =
-            \im(L)
+            \im(\Pi) = \im(W^{1/2}BL^+B^TW^{1/2}) \subseteq \im(W^{1/2}B)
         \end{align*}
         Any vector $y \in \im(W^{1/2}B)$ must satisfy $W^{1/2}Bx$ for some
         $x \not\in \ker(L)$, which means:
@@ -381,7 +381,7 @@ list some properties of the projection matrix with proofs:
                   &= W^{1/2}Bx \quad \text{since } x \not\in \ker(L) \\
                   &= y \in \im(\Pi)
         \end{align*}
-        So $\im(\Pi) = \im(W^{1/2}B) = \im(L)$.
+        So $\im(\Pi) = \im(W^{1/2}B)$.
 
     \item The eigenvalues of $\Pi$ are 1 ($n-1$ copies) and 0 ($m-n+1$
         copies).
@@ -389,8 +389,9 @@ list some properties of the projection matrix with proofs:
         Proof: By rank-nullity on $L$, $\dim(\ker(L)) + \dim(\im(L)) = 1 +
         (n-1) = n$. From this we have $\dim(\im(\Pi)) = n-1$. Because $\Pi$
         is a projection matrix all of its eigenvalues are either 1 or 0:
-        since the image of $\Pi$ has dimension $n-1$ it must have $n-1$ `1'
-        eigenvalues. The remaining $m-n+1$ eigenvalues must be `0's.
+        since the image of $\Pi$ has dimension $n-1$ it must have $n-1$
+        non-zero (`1') eigenvalues. The remaining $m-n+1$ eigenvalues must
+        be zeros.
 
     \item The diagonal elements of $\Pi$ are: $\Pi(e, e) = \sqrt{W(e,
         e)}R_e\sqrt{W(e, e)} = w(e)R_e$. We know $\Pi$ is symmetric by
@@ -401,9 +402,69 @@ list some properties of the projection matrix with proofs:
 \subsection{Linking the Laplacian and Projection matrices}
 
 Our goal is to find a sparsifier $\tilde{G}$ s.t the quadratic forms of $L$
-and $\tilde{L}$ are very close. In this section, we show that sparsifiers
-which keep the quadratic forms of $\Pi$ and $\tilde{\Pi}$ close achieve
-this.
+and $\tilde{L}$ are close. In this section, we show that sparsifiers which
+keep the quadratic forms of $\Pi$ and $\tilde{\Pi}$ close achieve this. The
+first step towards showing this is finding a symbolic expression for
+$\tilde{L}$. Suppose we sample $q$ edges to build $\tilde{G}$. Consider the
+random $(m \times m)$ \textit{edge sampling matrix}:
+\begin{align*}
+    S(e, e) = \frac{\tilde{w_e}}{w_e} = \text{(times e
+    sampled)}\frac{w_e}{qp_e}\frac{1}{w_e} = \frac{\text{(times e
+    sampled)}}{qp_e}
+\end{align*}
+Now write $\tilde{L}$ in terms of $S$, which controls `how much' of each
+edge is preserved:
+\begin{align*}
+    \tilde{L} = B^T\tilde{W}B = B^TWSB
+\end{align*}
+In expectation, the sparsifier exactly preserves all edge weights (implying
+$E[\tilde{L}] = L$ as desired):
+\begin{align*}
+    E\left[\frac{\tilde{w_e}}{w_e}\right] = \frac{1}{qp_e}E[\text{(times e
+    sampled)}] = \frac{1}{qp_e}qp_e = 1
+\end{align*}
+Now we prove the main theorem in this section: \\
+
+\noindent
+\textlcsc{Theorem 4 (Spielman-Srivastava)}: If $||\Pi S\Pi - \Pi\Pi||_2 \leq
+\epsilon$, we have $(1-\epsilon)L \preceq \tilde{L} \preceq (1+\epsilon)L$.
+
+\noindent
+By definition of the 2-norm for symmetric matrices:
+\begin{align*}
+    ||\Pi S\Pi - \Pi\Pi||_2 &= \sup_{y \in \R^m - \{\zero\}} \frac{|y^T(\Pi
+    S\Pi - \Pi\Pi)y|}{y^Ty} \\
+                            &= \sup_{y \in \R^m - \{\zero\}} \frac{|y^T(\Pi
+    (S - I)\Pi)y|}{y^Ty} \\
+                            &= \sup_{y \in \im(\Pi)} \frac{|y^T(\Pi
+    (S - I)\Pi)y|}{y^Ty}
+\end{align*}
+In the last step, we only optimize over $\im(\Pi) \subset \text{dom}(\Pi)$
+since the norm must be non-negative. Now, since $y \in \im(\Pi)$ already, we
+have $\Pi y = y$ so we can drop the extra $\Pi$ terms:
+\begin{align*}
+    ||\Pi S\Pi - \Pi\Pi||_2 = \sup_{y \in \im(\Pi)} \frac{|y^T(S -
+    I)y|}{y^Ty}
+\end{align*}
+Since we also have $y \in \im(W^{1/2}B)$, we know $y = W^{1/2}Bx$ for some
+$x$:
+\begin{align*}
+    ||\Pi S\Pi - \Pi\Pi||_2 &= \sup_{x \in \R^n, W^{1/2}Bx \not= \zero}
+    \frac{|x^TB^TW^{1/2}SW^{1/2}Bx - x^TB^TWBx|}{x^TB^TWBx} \\
+    &= \sup_{x \in \R^n, W^{1/2}Bx \not= \zero} \frac{x^T\tilde{L}x -
+x^TLx}{x^TLx} \\
+    &\leq \epsilon \quad \text{(by assumption)}
+\end{align*}
+With some rearranging, we get:
+\begin{align*}
+    \frac{x^TLx - x^T\tilde{L}x}{x^TLx} &\leq \epsilon \\
+    x^TLx - x^T\tilde{L}x &\leq \epsilon x^TLx \\
+    (1 - \epsilon)x^TLx &\leq x^T\tilde{L}x
+\end{align*}
+Analogous algebra gives us for $\frac{x^T\tilde{L}x - x^TLx}{x^TLx}$ lets us
+conclude $(1-\epsilon)L \preceq \tilde{L} \preceq (1+\epsilon)L$. We are now
+equipped with a powerful link between $L$ and $\Pi$ which simplifies the
+remainder of the analysis and leads to a practical edge-sampling strategy.
 
 \subsection{Bounding the expected approximation error}
 
