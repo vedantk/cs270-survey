@@ -29,15 +29,15 @@ min-cuts in nearly-linear time.
 
 \section{Introduction}
 
-Sparse graphs have a similar number of edges and vertices, up to a polylog
-factor ($|E| \in \tilde{O}(|V|)$). In contrast, dense graphs (such as the
-complete graph) permit a quadratic number of edges ($|E| \in O(|V|^2)$). If
-the number of vertices is fixed, many graph algorithms run significantly
-faster and with lower storage requirements on sparse inputs.  Moreover, each
-edge in a sparse graph tends to contribute `more' to the overall shape and
-structure of the graph.  Working with sparse graphs can save time, save
-space, and provide insight into the nature of a graph: this makes graph
-sparsification interesting.
+Sparse graphs have roughly the same number of edges and vertices, up to a
+polylog factor ($|E| \in \tilde{O}(|V|)$). In contrast, dense graphs (such
+as the complete graph) permit a quadratic number of edges ($|E| \in
+O(|V|^2)$). If the number of vertices is fixed, many graph algorithms run
+significantly faster and with lower storage requirements on sparse inputs.
+Moreover, each edge in a sparse graph tends to contribute `more' to the
+overall shape and structure of the graph.  Working with sparse graphs can
+save time, save space, and provide insight into the nature of a graph: this
+makes graph sparsification interesting.
 
 In order to assess the quality of a sparsification algorithm, we need a way
 to measure similarity between a graph and its sparse approximation. Section
@@ -50,8 +50,8 @@ edge-sampling scheme. Section 4 mentions some applications.
 \section{Graph Similarity}
 
 In this section we explain how \textit{cut similarity} naturally leads to
-\textit{spectral similarity}, a strictly stronger measure of the quality of
-a sparsifier.
+\textit{spectral similarity}, a strictly stronger measure of sparsifier
+quality. We also mention influential results in sparsification.
 
 \subsection{Conventions}
 
@@ -64,11 +64,12 @@ comparing two graphs, we always assume that they share the same vertex set.
 
 \subsection{Cut similarity}
 
-Two graphs are \textit{cut similar} if all of their cuts have approximately
-similar weights. To make this concrete, consider two graphs $G = (V, w)$ and
-$\tilde{G} = (V, \tilde{w})$. A \textit{cut} is a subset of vertices $S
-\subset V$.  The weight of a cut is given by the sum of the weights of edges
-on the cut:
+In this section we describe cut similarity and cite an early result in the
+field. Two graphs are \textit{cut similar} if all of their cuts have
+approximately similar weights. To make this concrete, consider two graphs $G
+= (V, w)$ and $\tilde{G} = (V, \tilde{w})$. A \textit{cut} is a subset of
+vertices $S \subset V$.  The weight of a cut is given by the sum of the
+weights of edges on the cut:
 \begin{align*}
     \cut{G}(S) = \sum_{u \in S, v \in V - S} w(u, v)
 \end{align*}
@@ -96,8 +97,9 @@ sparsifiers exist for \textit{every} graph.
 
 \subsection{Spectral similarity}
 
-The \textit{Laplacian quadratic form} of a graph $G = (V, E, w)$ is given by
-the map $Q_G : \Re^n \rightarrow \Re$:
+In this section we motivate and define spectral similarity. The
+\textit{Laplacian quadratic form} of a graph $G = (V, E, w)$ is given by the
+map $Q_G : \Re^n \rightarrow \Re$:
 \begin{align*}
     Q_G(x) = \sum_{(u, v) \in E} w(u, v)(x(u) - x(v))^2
 \end{align*}
@@ -110,9 +112,8 @@ $S$:
 \begin{align*}
     \cut{G}(S) = Q_G(\mathbf{1}_S)
 \end{align*}
-At this point we could redefine cut similarity by restricting $Q_G$ to $\{0,
-1\}^n$. We get a stronger criterion by considering the entire domain.  The
-graphs $(G, \tilde{G})$ are \textit{$\epsilon$-spectrally similar} if:
+We get cut similarity by restricting $Q_G$ to $\{0, 1\}^n$. The graphs $(G,
+\tilde{G})$ are \textit{$\epsilon$-spectrally similar} if:
 \begin{align*}
     (1 - \epsilon)Q_{\tilde{G}}(x) \leq Q_G(x) \leq (1 +
     \epsilon)Q_{\tilde{G}}(x) \quad \forall{x \in \Re^n}
@@ -120,38 +121,40 @@ graphs $(G, \tilde{G})$ are \textit{$\epsilon$-spectrally similar} if:
 
 There is an intuitive way to see that cut similarity is not as strong as
 spectral similarity. Consider a $k$-cycle and a $k$-path. We can make the
-$k$-path a $k$-cycle by adding one edge, which we call $e'$. Most cuts on
-the vertex set $\{1..k\}$ have identical weights on both graphs because they
-don't touch $e'$, making the graphs fairly cut-similar. However, we know
-that the $k$-cycle is 2-connected while the $k$-path isn't. We conclude that
-the Fiedler values of the two graphs are dissimilar, which in turn implies
-spectral dissimilarity \cite{Fiedler}. Apart from connectivity, spectrally
-similar graphs are more likely to share a host of other structural
-characteristics captured by Laplacian quadratic form.
+$k$-path a $k$-cycle by adding an edge $e'$. Most cuts on $\{1..k\}$ have
+identical weights on both graphs because they don't touch $e'$, so the
+graphs are fairly cut-similar. However, we know that the $k$-cycle is
+2-connected while the $k$-path isn't. We conclude that the second-smallest
+eigenvalues of the two graphs are dissimilar, implying spectral
+dissimilarity \cite{Fiedler}. Apart from connectivity, spectrally similar
+graphs are more likely to share a host of other structural characteristics
+captured by Laplacian quadratic form.
 
 Spectrally similar graphs also share algebraic properties. Consider the
 problem of finding vertex labellings $(l, \tilde{l})$ for
 $\epsilon$-spectrally similar graphs $(G, \tilde{G})$ with some of the
 labels fixed a priori. We can pose this as a regression problem. First solve
 for the unknowns in $l \in \Re^n$ by minimizing $Q_G(l)$, then use the
-result to approximate $\tilde{l}$. Intuitively, we expect to find a good
-approximation because $Q_G(x)$ and $Q_{\tilde{G}}(x)$ match very well over
-$\Re^n$ \cite{TheSurvey}.
+result to approximate a full labelling $\tilde{l}$. Intuitively, we expect
+to find a good approximation because $Q_G(x)$ and $Q_{\tilde{G}}(x)$ match
+very well over $\Re^n$ \cite{TheSurvey}.
 
-\subsection{Building spectral sparsifiers}
+\subsection{The Laplacian quadratic form}
 
-The spectral similarity criterion is very strong. It is not obvious that
-every graph has a sparse, spectrally-similar cousin. We need some linear
-algebra to find these spectral sparsifiers. The central object we are
-interested in is the $n \times n$ graph \textit{Laplacian matrix}:
+In this section we explain some important properties of the Laplacian
+quadratic form. We rely on these properties heavily throughout the rest of
+this survey. The central object we are interested in is the $n \times n$
+graph \textit{Laplacian matrix}:
 \begin{align*}
-    L_G =
+    L_G &= D - A \\
+        &= 
     \begin{cases}
         -w(u, v) \quad &\text{if } u \not= v \\
         \sum_{z} w(u, z) \quad &\text{if } u = v
     \end{cases}
 \end{align*}
-We can use $L_G$ to simplify the Laplacian quadratic form:
+Here, $D$ is a diagonal matrix of vertex degrees and $A$ is the adjacency
+matrix.  We can use $L_G$ to simplify the Laplacian quadratic form:
 \begin{align*}
     Q_G(x) = x^TL_Gx
 \end{align*}
@@ -166,13 +169,13 @@ equivalent:
     i = u, j = v &:\quad -w(u, v)x_ux_v \\
     i = v, j = u &:\quad -w(u, v)x_ux_v
 \end{align*}
-We can order symmetric matrices in $\Re^{n \times n}$ by looking at their
-quadratic forms:
+We can order symmetric PSD matrices by looking at their quadratic forms:
 \begin{align*}
     A \preceq B \Leftrightarrow x^TAx \leq x^TBx \quad \forall{x \in \Re^n}
 \end{align*}
 Now we can check if two graphs are $\epsilon$-spectrally similar by
-comparing their Laplacians:
+comparing their Laplacians \footnote{We have used the fact that the
+Laplacian is positive semi-definite here, which is shown in Section 3.}:
 \begin{align*}
     (1 - \epsilon)L_{\tilde{G}} \preceq L_G \preceq (1 +
     \epsilon)L_{\tilde{G}}
@@ -191,9 +194,7 @@ Laplacians are similar:
     \epsilon)\lambda_i(L_{\tilde{G}}) \quad \forall{i}
 \end{align*}
 This fact can be used to show that the total edge weight of a graph is
-roughly preserved by an $\epsilon$-spectral approximation \footnote{We have
-used the fact that the Laplacian is positive semi-definite here, which is
-shown in Section 3.}:
+roughly preserved by an $\epsilon$-spectral approximation:
 \begin{align*}
     \Tr(L_G) = 2\sum_{e \in E} w(e) = \sum_i \lambda_i(L_G) \approx
     \Tr(L_{\tilde{G}}) = 2\sum_{e \in \tilde{E}} \tilde{w}(e)
@@ -201,12 +202,17 @@ shown in Section 3.}:
 Edges in spectral sparsifiers literally `carry more weight' and play a
 greater role in maintaining the structure of the graph.
 
-We are interested in building spectral sparsifiers using edge-sampling s.t
-$\tilde{G} \subset G$. In order to achieve spectral similarity, we would
-like $L_{\tilde{G}}$ to be close to $L_G$ in expectation. We can enforce
-$E[L_{\tilde{G}}] = L_G$ with the following process:
+\subsection{Building spectral sparsifiers}
+
+In this section, we discuss a result which shows that every graph has a
+sparse, spectrally-similar cousin. We are interested in building spectral
+sparsifiers using edge-sampling s.t $\tilde{G} \subset G$. In order to
+achieve spectral similarity, we would like $L_{\tilde{G}}$ to be close to
+$L_G$ in expectation. We can enforce $E[L_{\tilde{G}}] = L_G$ with the
+following process:
 \begin{itemize}
-    \item Assign each edge a selection probability $p_e$.
+    \item Assign each edge a selection probability $p_e$ (most of our effort
+        is expended here).
     \item Initialize all edges weights $\tilde{w}_e$ in $\tilde{G}$ to 0:
         when an edge $e$ is added to $\tilde{G}$, add $w_e/p_e$ to
         $\tilde{w}_e$.
@@ -216,12 +222,14 @@ $E[L_{\tilde{G}}] = L_G$ with the following process:
 If the edge selection probabilities are too high, $\tilde{G}$ becomes too
 dense. If they are too low, the spectrum of $L_{\tilde{G}}$ may not be close
 enough to the spectrum of $L_G$. The probabilities $p_e$ should reflect the
-fact that some edges are more important than others. Informally, the
-\textit{conductance} of a subset $S \subset V$ is the number of edges on the
-cut boundary of $S$ divided by the number of edges `contained' by the cut.
-An early edge-sampling scheme worked by splitting up the vertex set of $G$
-into high-conductance components, and by prioritizing the edges between
-these components. This led to the following result: \\
+fact that some edges are more important than others.
+
+Informally, the \textit{conductance} of a subset $S \subset V$ is the number
+of edges on the cut boundary of $S$ divided by the number of edges
+`contained' by the cut.  An early edge-sampling scheme worked by splitting
+up the vertex set of $G$ into high-conductance components, and by
+prioritizing the edges between these components. This led to the following
+result: \\
 
 \noindent
 \textlcsc{Theorem 2 (Spielman-Teng)}: \textit{Let $\epsilon > 0$. W.h.p $G =
@@ -231,8 +239,7 @@ $O(m\log^{O(1)}m)$ time \cite{SpielmanTeng} \cite{TheSurvey}.} \\
 
 Theorem 2 implies the somewhat surprising fact that arbitrary graphs have
 high-quality spectral sparsifiers. From here, our focus shifts to finding
-improved time and space bounds for the sparsification algorithm. Section 3
-covers a fast spectral sparsification algorithm in detail.
+improved time and space bounds for the sparsification algorithm.
 
 \section{Fast Spectral Sparsification}
 
@@ -243,6 +250,13 @@ The goal of this section is to examine the following theorem in detail: \\
 W.h.p $G = (V, E)$ has an $\epsilon$-spectrally similar subgraph $\tilde{G}$
 s.t $\tilde{m} \in O(\epsilon^{-2}n\log n)$. $\tilde{G}$ can be found in
 $\tilde{O}(m)$ time \cite{SpielmanSrivastava} \cite{TheSurvey}.} \\
+
+The Spielman-Srivastava algorithm has two stages: (1) compute edge selection
+probabilities, and (2) sample edges. The first step calls for the solution
+of $\log m$ Laplacian systems, for which the best known time bound is $O(m
+\log m \log n \log\log n)$ \cite{FastLaplacianSolver} \cite{TheSurvey}. The
+second step can be completed in $O(\epsilon^{-2}n\log n)$ time, for a total
+runtime of $\tilde{O}(m)$.
 
 A few facts about $L_G$:
 \begin{enumerate}[1.]
@@ -271,9 +285,6 @@ Cover the effective-resistances paper.
     \item Chandra, A.K., Raghavan, P., Ruzzo, W.L., Smolensky, R., Tiwari,
         P.  The electrical resistance of a graph captures its commute and
         cover times. In (1989), ACM, New York, NY, USA, 574–586.
-
-    \item Spielman, D.A., Srivastava, N. Graph sparsification by effective
-        resistances.  6 (2011), 1913–1926.
 \end{enumerate}
 
 \end{document}
