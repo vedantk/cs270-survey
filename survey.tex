@@ -337,7 +337,7 @@ The pseudo-inverse is given by:
 \end{align*}
 Fortunately, $LL^+$ behaves like the identity matrix when $\ker(L)$ is
 not involved (basically because $\zero$ is not invertible). When we are
-restricted to $\im(L) = \Span^{\bot}(\one)$, we have:
+restricted to $\im(L) = \Span(\one)^{\bot}$, we have:
 \begin{align*}
     LL^+ &= U\Sigma V^*V\Sigma^+ U^*
              = U\Sigma \one \Sigma^+ U^*
@@ -399,6 +399,11 @@ list some properties of the projection matrix with proofs:
 \end{enumerate}
 
 \subsection{Linking the Laplacian and Projection matrices}
+
+Our goal is to find a sparsifier $\tilde{G}$ s.t the quadratic forms of $L$
+and $\tilde{L}$ are very close. In this section, we show that sparsifiers
+which keep the quadratic forms of $\Pi$ and $\tilde{\Pi}$ close achieve
+this.
 
 \subsection{Bounding the expected approximation error}
 
