@@ -28,9 +28,9 @@ this paper we survey major results in spectral sparsification, a special
 case in which important structural and algebraic properties of graphs are
 preserved. We explain a key result: that every graph has a spectral
 sparsifier with $O(|V|\log|V|)$ edges w.h.p, and that such sparsifiers can
-be found in $\tilde{O}(|E|)$ time. We finish by discussing some applications
-of spectral sparsification, such as computing electrical flows and finding
-min-cuts in nearly-linear time.
+be found in $\tilde{O}(|E|)$ time. We finish by discussing an application of
+spectral sparsification to the problem of computing electrical flows in
+nearly-linear time.
 
 \section{Introduction}
 
@@ -260,10 +260,10 @@ $\tilde{O}(m)$ time \cite{SpielmanSrivastava} \cite{TheSurvey}.} \\
 
 The Spielman-Srivastava algorithm has two stages: (1) compute edge selection
 probabilities, and (2) sample edges. The first step requires solving $\log
-m$ Laplacian linear systems, for which the best known time bound is $O(m
-\log m \log n \log\log n)$ \cite{FastLaplacianSolver} \cite{TheSurvey}. The
-second step can be completed in $O(\epsilon^{-2}n\log n)$ time, for a total
-runtime of $\tilde{O}(m)$.
+m$ Laplacian systems, for which the best known time bound is $O(m \log m
+\log n \log\log n)$ \cite{FastLaplacianSolver} \cite{TheSurvey}. The second
+step can be completed in $O(\epsilon^{-2}n\log n)$ time, for a total runtime
+of $\tilde{O}(m)$.
 
 \subsection{Preliminaries}
 
@@ -510,29 +510,88 @@ We pick $q \in O(\frac{C^2}{\epsilon^2}n\log n)$ and apply Theorem 5 to get:
     E\left[\left| \frac{1}{q} \sum^q_{i=1} y_iy^T_i - E[yy^T] \right|_2
     \right] \leq \frac{\epsilon}{2}
 \end{align*}
-Which holds for large $n$ and $\epsilon \geq \frac{1}{\sqrt{n}}$. Markov's
-inequality tells us that the probability of the approximation error being
-greater than $\epsilon$ is upper-bounded by $E[|\Pi S \Pi -
+Which holds for large $n$ and when $\epsilon \geq \frac{1}{\sqrt{n}}$.
+Markov's inequality tells us that the probability of the approximation error
+being greater than $\epsilon$ is upper-bounded by $E[|\Pi S \Pi -
 \Pi\Pi|_2]/\epsilon = \frac{1}{2}$. In practice we expect the approximation
 error to be tightly concentrated around $\frac{\epsilon}{2}$.
 
 \subsection{Computing the edge selection probabilities}
 
-\section{Applications}
+In this section we discuss how to find a good set of edge selection
+probabilities. Recall that $p_e \approx w_eR_e$, and that the effective
+resistance matrix is given by $R = BL^+B^T$. It would be slow to compute $R$
+exactly.  Fortunately, an $\alpha$-approximation of $R$ can be used in
+Theorem 5, with the only side-effect of pushing the expected approximation
+error to $\frac{\alpha\epsilon}{2}$.
+
+To find a good approximation of $R$, we use a fact proven in Section 4 of
+\cite{SpielmanSrivastava}: the effective resistances $R_e$ are just pairwise
+distances of vectors in the space:
+\begin{align*}
+    W^{1/2}BL^+\one_v \quad \forall{v \in V}
+\end{align*}
+These distances are more-or-less preserved if we project this space onto a
+subspace spanned by $O(\log m)$ random vectors: \\
+
+\noindent
+\textlcsc{Theorem 6 (Johnson-Lindenstrauss)}: Fix vectors $v_{1..m} \in
+\R^n$. Let $\epsilon > 0$, $k \geq 24\epsilon^{-2}\log m$, and $Q_{k \times
+m}$ be a random matrix with entries $\pm k^{-1/2}$. Then with probability
+$\geq 1 - \frac{1}{m}$ \cite{SpielmanSrivastava} \cite{Achlioptas}:
+\begin{align*}
+    (1-\epsilon)||v_i-v_j||^2_2 \leq ||Qv_i-Qv_j||^2_2 \leq
+    (1+\epsilon)||v_i-v_j||^2_2 \quad \forall{(i,j)}
+\end{align*}
+
+Let $\tilde{Z} \approx QW^{1/2}BL^+$. We can use a fast solver for Laplacian
+systems to compute its rows. Spielman-Srivastava use the solver from an
+earlier paper \cite{SpielmanTeng}. A later survey recommends the solver by
+Koutis et. al \cite{TheSurvey} \cite{FastLaplacianSolver}.
+
+\subsection{Overview}
+
+In this section we summarize the Spielman-Srivastava algorithm. We also
+mention another spectral sparsification algorithm which produces a linear
+sparsifier but takes cubic time. Spielman-Srivastava can be run as follows:
+\begin{itemize}
+    \item Compute an approximate effective resistance matrix $\tilde{Z}
+        \approx QW^{1/2}BL^+$ by using a fast solver for Laplacian systems.
+
+        The entries of the matrix $Q$ are $\pm k^{-1/2}$, where the sign is
+        positive with probability $1/2$. We assume efficient representations
+        for $W$ and $B$ are used, since they contain only $m$ and $2m$
+        entries respectively. It is not necessary to compute $\text{SVD}(L)$
+        to find $L^+$: we assume the Laplacian solver computes the
+        pseudo-inverse efficiently. Each one of the $O(\log m)$ rows of
+        $\tilde{Z}$ can be computed by running $\tilde{z}_i =
+        \text{LSolve}(L, [QW^{1/2}B]_i, \delta)$ for some error parameter
+        $\delta$.
+
+    \item Compute $p_e = \frac{w_e||\tilde{Z}(\one_u -
+        \one_v)^2||^2_2}{n-1}$ for each edge. Sample $q$ edges based on the
+        distribution $p_e$.
+
+        Note that edges may be sampled efficiently using the array $P =
+        [p_{e_1}, p_{e_1} + p_{e_2}, ..., \sum_e p_e]$. Once $P$ is
+        constructed, we can sample an edge by generating a random number $r
+        \in [0,1]$ and binary searching for $r$ in $P$. 
+\end{itemize}
+There is another sparsification algorithm by Batson, Spielman, and
+Srivastava which produces $O(n)$-edge spectral sparsifiers in $O(mn^3)$ time
+\cite{BatsonSpielmanSrivastava}. We mention it here for two reasons.  First,
+it exhibits a classic space-time tradeoff (i.e it has an asymptotically
+higher runtime but produces sparser results). Second, it implies that every
+graph has a high-quality spectral sparsifier with a linear number of edges,
+which is very surprising.
+
+\section{Computing Electrical Flows}
 
 \bibliographystyle{unsrt}
 \bibliography{ref}
 
-\begin{enumerate}[1.]
-    \item Achlioptas, D., Mcsherry, F. Fast computation of low-rank matrix
-        approximations. 2 (2007), 9.
-
-    \item Batson, J.D., Spielman, D.A., Srivastava, N.  Twice-Ramanujan
-        sparsifiers. 6 (2012), 1704 –1721.
-
-    \item Chandra, A.K., Raghavan, P., Ruzzo, W.L., Smolensky, R., Tiwari,
+    Chandra, A.K., Raghavan, P., Ruzzo, W.L., Smolensky, R., Tiwari,
         P.  The electrical resistance of a graph captures its commute and
         cover times. In (1989), ACM, New York, NY, USA, 574–586.
-\end{enumerate}
 
 \end{document}
