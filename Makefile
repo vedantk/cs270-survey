@@ -6,5 +6,8 @@ all: $(patsubst %.tex, %.pdf, $(wildcard *.tex))
 	pdflatex $<
 	pdflatex $<
 
+%.html: %.tex
+	htlatex $<
+
 clean:
 	rm -f survey.pdf *.aux *.log *.blg *.bbl
