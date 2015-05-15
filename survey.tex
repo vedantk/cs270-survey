@@ -61,6 +61,8 @@ maps edges to their weights. All edges must have positive weights, so $w(u,
 v) = 0 \Leftrightarrow (u, v) \not\in E$, allowing us to write $G = (V, w)$
 w.l.o.g. For notational simplicity we define $n = |V|$ and $m = |E|$. When
 comparing two graphs, we always assume that they share the same vertex set.
+Finally, we use the notation $A_k$ to refer to the $k$-th column vector of
+some matrix $A$. 
 
 \subsection{Cut similarity}
 
@@ -243,7 +245,8 @@ improved time and space bounds for the sparsification algorithm.
 
 \section{Fast Spectral Sparsification}
 
-The goal of this section is to examine the following theorem in detail: \\
+The goal of this section is to examine the following fast spectral
+sparsification algorithm in detail: \\
 
 \noindent
 \textlcsc{Theorem 3 (Spielman-Srivastava)}: \textit{Let $\epsilon > 0$.
@@ -258,7 +261,61 @@ of $\log m$ Laplacian systems, for which the best known time bound is $O(m
 second step can be completed in $O(\epsilon^{-2}n\log n)$ time, for a total
 runtime of $\tilde{O}(m)$.
 
-A few facts about $L_G$:
+\subsection{Preliminaries}
+
+We need some basic facts and definitions to explain Theorem 3. Let each edge
+in $G$ have some fixed (possibly arbitrary) orientation. The $(m \times n)$
+\textit{signed edge-vertex incidence matrix} is:
+\begin{align*}
+    B(e, v) =
+    \begin{cases}
+        1 \quad &\text{if } e = (v, u) \\
+        -1 \quad &\text{if } e = (u, v) \\
+        0 \quad &\text{otherwise}
+    \end{cases}
+\end{align*}
+The diagonal $(m \times m)$ \textit{edge weight matrix} is: $W(e, e) =
+w(e)$. The Laplacian matrix $L_G$ can be written in terms of edge weights
+and edge-vertex incidences:
+\begin{align*}
+    L_G = B^TWB
+\end{align*}
+To see why this is true, consider the 3-cycle (a triangle) where all edge
+weights are 1. We have:
+\begin{align*}
+    B^T =
+    \begin{pmatrix}
+        1 & 0 & -1 \\
+        -1 & 1 & 0 \\
+        0 & -1 & 1
+    \end{pmatrix} \quad
+    B =
+    \begin{pmatrix}
+        1 & -1 & 0 \\
+        0 & 1 & -1 \\
+        -1 & 0 & 1
+    \end{pmatrix} \quad
+    L_G =
+    \begin{pmatrix}
+        2 & -1 & -1 \\
+        -1 & 2 & -1 \\
+        -1 & -1 & 2
+    \end{pmatrix} \quad
+\end{align*}
+The $i$-th diagonal element of $B^TB$ is given by $B^T_iB_i$, which simply
+counts the number of edges in the neighborhood of vertex $i$ (i.e $\sum_z
+w(i, z)$). For other entries $B^T_jB_i$ ($i \not= j$), all non-zero terms in
+the inner product must be negative because they must correspond to one of
+$(i, j)$ or $(j, i)$ (i.e $-w(i, j)$). The result is exactly the graph
+Laplacian.  If this intuitive approach is not satisfactory, it may suffice
+to verify that $L_G = B^T\mathbf{1}B$ for the triangle.
+
+We can now easily verify that $L_G$ is positive semi-definite (PSD):
+\begin{align*}
+    x^TL_Gx = x^TB^TWBx = ||W^{\frac{1}{2}}Bx||^2_2 \geq 0 \quad \forall{x
+    \in \Re^n}
+\end{align*}
+
 \begin{enumerate}[1.]
     \item $L_G$ is symmetric.
 
